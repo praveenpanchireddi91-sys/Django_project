@@ -1,0 +1,350 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Teacher Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+
+        body{
+            background:#f4f7fb;
+            font-family:Arial, sans-serif;
+        }
+
+        .navbar-custom{
+            background:#0d6efd;
+            padding:15px 30px;
+        }
+
+        .navbar-brand{
+            color:white;
+            font-size:25px;
+            font-weight:bold;
+        }
+
+        .dashboard-container{
+            margin-top:40px;
+        }
+
+        .filter-card{
+            background:white;
+            border-radius:15px;
+            padding:25px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .table-card{
+            background:white;
+            border-radius:15px;
+            padding:20px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .table th{
+            background:#0d6efd;
+            color:white;
+            text-align:center;
+        }
+
+        .table td{
+            text-align:center;
+            vertical-align:middle;
+        }
+
+        .save-btn{
+            background:#198754;
+            color:white;
+            border:none;
+            padding:10px 25px;
+            border-radius:10px;
+            font-weight:bold;
+        }
+
+        .save-btn:hover{
+            background:#157347;
+        }
+
+        .form-select{
+            padding:10px;
+        }
+
+        .student-name{
+            text-align:left !important;
+            font-weight:600;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-custom">
+
+        <div class="container-fluid">
+
+            <a class="navbar-brand" href="#">
+
+                <i class="bi bi-mortarboard-fill"></i>
+
+                Attendance System
+
+            </a>
+
+            <a href="{% url 'teacher_login' %}" class="btn btn-light">
+
+                <i class="bi bi-box-arrow-right"></i>
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </nav>
+
+    <div class="container dashboard-container">
+
+        <div class="row">
+
+            <div class="col-lg-3">
+
+                <div class="filter-card">
+
+                    <h4 class="mb-4">
+
+                        <i class="bi bi-funnel"></i>
+
+                        Filter Students
+
+                    </h4>
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Academic Year
+
+                            </label>
+
+                            <select class="form-select" name="year" required>
+
+                                <option value="1">
+
+                                    First Year
+
+                                </option>
+
+                                <option value="2">
+
+                                    Second Year
+
+                                </option>
+
+                                <option value="3">
+
+                                    Third Year
+
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            name="load_students"
+                            class="btn btn-primary w-100"
+                        >
+
+                            <i class="bi bi-search"></i>
+
+                            Load Students
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-9">
+
+                <div class="table-card">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+
+                        <h4>
+
+                            <i class="bi bi-card-checklist"></i>
+
+                            Mark Attendance
+
+                        </h4>
+
+                    </div>
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        <input
+                            type="hidden"
+                            name="selected_year"
+                            value="{{ selected_year }}"
+                        >
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Attendance Date
+
+                            </label>
+
+                            <input
+                                type="date"
+                                class="form-control"
+                                name="attendance_date"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="table-responsive">
+
+                            <table class="table table-bordered table-hover">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>S.No</th>
+
+                                        <th>Student Name</th>
+
+                                        <th>Year</th>
+
+                                        <th>Status</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    {% for x in students %}
+
+                                    <tr>
+
+                                        <td>
+
+                                            {{ forloop.counter }}
+
+                                        </td>
+
+                                        <td class="student-name">
+
+                                            {{ x.name }}
+
+                                        </td>
+
+                                        <td>
+
+                                            {{ x.get_year_display }}
+
+                                        </td>
+
+                                        <td>
+
+                                            <select
+                                                name="attendance_{{ x.id }}"
+                                                class="form-select"
+                                            >
+
+                                                <option value="Present">
+
+                                                    Present
+
+                                                </option>
+
+                                                <option value="Absent">
+
+                                                    Absent
+
+                                                </option>
+
+                                            </select>
+
+                                        </td>
+
+                                    </tr>
+
+                                    {% empty %}
+
+                                    <tr>
+
+                                        <td colspan="4" class="text-center p-4">
+
+                                            Select year and click Load Students
+
+                                        </td>
+
+                                    </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        {% if students %}
+
+                        <div class="text-end mt-3">
+
+                            <button
+                                type="submit"
+                                name="save_attendance"
+                                class="save-btn"
+                            >
+
+                                <i class="bi bi-save"></i>
+
+                                Save Attendance
+
+                            </button>
+
+                        </div>
+
+                        {% endif %}
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
